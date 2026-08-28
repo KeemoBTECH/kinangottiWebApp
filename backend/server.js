@@ -1,27 +1,42 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001', 'http://192.168.8.164:3000'] }));
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/notices', require('./routes/notices'));
-app.use('/api/events', require('./routes/events'));
-app.use('/api/applications', require('./routes/applications'));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/notices", require("./routes/notices"));
+app.use("/api/events", require("./routes/events"));
+app.use("/api/applications", require("./routes/applications"));
+
+// Test route
+app.get("/", (req, res) => {
+  res.json({
+    message: "Kinango TVC API is running successfully",
+  });
+});
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error(err));
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// IMPORTANT:
+// Do NOT use app.listen() on Vercel
+
+module.exports = app;
